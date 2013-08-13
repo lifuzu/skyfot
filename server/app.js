@@ -29,12 +29,12 @@ app.post('/upload', function(req, res){
 
 	var photoDir = __dirname+"/photos/";
 	var thumbnailsDir = __dirname+"/photos/thumbnails/";
-	var photoName = req.files.source.name;
+	var photoName = req.files.file.name;
 
 	console.log(photoDir+photoName);
 
 	fsextra.move(
-		req.files.source.path,
+		req.files.file.path,
 		photoDir+photoName,
 		function(err){
 			if(err != null){

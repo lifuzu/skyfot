@@ -1,3 +1,5 @@
 platforms/android/bin
 server/node_modules
 server/photos
+
+.DS_Store
