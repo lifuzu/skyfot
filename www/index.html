@@ -32,9 +32,10 @@
                 <h1>SkyFot.com</h1>
                 <a onclick="captureImage();" data-icon="check" class="ui-btn-right">SnapOne</a>
             </div><!-- /header -->
-            <div id="deviceready" class="blink" data-role="content">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
+            <div data-role="content">
+                <ul id="file-list">
+                    <li class="no-items">(no files uploaded yet)</li>
+                </ul>
             </div>
             <!--<div data-role="footer">
                 <h4>My Footer</h4>
@@ -55,7 +56,66 @@
                 for (var i = 0, len = mediaFiles.length; i < len; i += 1) {
                     // console.log();
                     showAlert();
+                    displayCapture(mediaFiles[i]);
                     uploadFile(mediaFiles[i]);
+                }
+            }
+
+            // Display the capture immediately
+            function displayCapture(mediaFile) {
+                /*window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, function(fs){
+                    fs.root.getFile("temp", {create: true, exclusive: false},
+                      function(entry){
+                        fileTransfer.download(
+                                Url, // the filesystem uri you mentioned
+                                entry.fullPath,
+                                function(entry) {
+                                    // do what you want with the entry here
+                                    console.log("download complete: " + entry.fullPath);
+                                },
+                                function(error) {
+                                    console.log("error source " + error.source);
+                                    console.log("error target " + error.target);
+                                    console.log("error code " + error.code);
+                                },
+                                false,
+                                null
+                        );
+                    }, function(){
+                        alert("file create error");
+                    });
+                }, null);*/
+                window.resolveLocalFileSystemURI(mediaFile.fullPath, gotFileEntry, fail);
+
+                function gotFileEntry(fileEntry) {
+                    fileEntry.file(gotFile, fail);
+                }
+
+                function fail(evt) {
+                    console.log(evt.target.error.code);
+                }
+
+                function gotFile(file){
+                    readDataUrl(file);  
+                }
+
+                function readDataUrl(file) {
+                    var reader = new FileReader(),
+                        img = document.createElement("img"),
+                        li = document.createElement("li"),
+                        file_list = document.getElementById("file-list");
+
+                    li.appendChild(img);
+                    reader.onloadend = function(evt) {
+                        console.log(evt.target.result);
+                        //img.style.display='block';
+                        img.src = evt.target.result;
+                    };
+                    reader.onerror = function(error) {
+                        console.log('Error read file ' + path + ': ' + error.code);
+                    };
+                    reader.readAsDataURL(file);
+                    file_list.appendChild(li);
                 }
             }
 
@@ -91,8 +151,13 @@
             // Upload files to server
             function uploadFile(mediaFile) {
                 var ft = new FileTransfer(),
+                    options = new FileUploadOptions(),
                     path = mediaFile.fullPath,
                     name = mediaFile.name;
+
+                options.fileKey="file";
+                options.fileName=name;
+                options.mimeType="image/jpeg";
 
                 ft.upload(path,
                     "http://192.168.1.107:8000/upload",
@@ -103,7 +168,7 @@
                     function(error) {
                         console.log('Error uploading file ' + path + ': ' + error.code);
                     },
-                    { source: name});
+                    options);
             }
         </script>
     </body>

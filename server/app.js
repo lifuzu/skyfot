@@ -18,7 +18,7 @@ app.use(express.bodyParser())
 app.get('/', function(req, res){
     res.send(
         '<form action="/upload" method="post" enctype="multipart/form-data">'+
-        '<input type="file" name="source">'+
+        '<input type="file" name="file">'+
         '<input type="submit" value="Upload">'+
         '</form>'
     );
